@@ -11,7 +11,7 @@ public class Fila implements IFila<Paciente> {
         this.fim = null;
         this.tamanho = 0;
     }
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return this.tamanho == 0;
     }
     public int size(){
