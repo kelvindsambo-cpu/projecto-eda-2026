@@ -1,6 +1,9 @@
 package estruturas;
 
-public class Fila {
+import excecoes.FilaVaziaException;
+import modelo.Paciente;
+
+public class Fila implements IFila<Paciente> {
     private No inicio;
     private No fim;
     private int tamanho;
@@ -11,40 +14,40 @@ public class Fila {
         this.tamanho = 0;
     }
     public boolean isEmpty(){
-        return tamanho == 0;
+        return this.tamanho == 0;
     }
-    public int tamanho(){
-        return tamanho;
+    public int size(){
+        return this.tamanho;
     }
-    public void adicionar(Paciente paciente){
-        No novoNo = new No(paciente);
+    public void enqueue(Paciente elemento){
+        No novoNo = new No(elemento);
         if(isEmpty()){
-            inicio = novoNo;
-            fim = novoNo;
-            tamanho++;
+            this.inicio = novoNo;
+            this.fim = novoNo;
+            this.tamanho++;
             return;
         }
-        fim.setProximo(novoNo);
-        fim = novoNo;
-        tamanho++;
+        this.fim.setProximo(novoNo);
+        this.fim = novoNo;
+        this.tamanho++;
     }
-    public Paciente remover(){
+    public Paciente dequeue() throws FilaVaziaException {
         if(isEmpty()){
-            return null;
+            throw new FilaVaziaException("A fila está vazia.");
         }
-        Paciente paciente = inicio.getPaciente();
-        inicio = inicio.getProximo();
-        tamanho--;
-        if(inicio == null){
-            fim = null;
+        Paciente paciente = this.inicio.getPaciente();
+        this.inicio = this.inicio.getProximo();
+        this.tamanho--;
+        if(this.inicio == null){
+            this.fim = null;
         }
         return paciente;
     }
     
-    public Paciente primeiro(){
+    public Paciente peek() throws FilaVaziaException {
         if(isEmpty()){
-            return null;
+            throw new FilaVaziaException("A fila está vazia.");
         }
-        return inicio.getPaciente();
+        return this.inicio.getPaciente();
     }
 }
