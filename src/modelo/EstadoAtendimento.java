@@ -1,4 +1,4 @@
-package src.modelo;
+package modelo;
 
 public enum EstadoAtendimento {
     AGUARDANDO,
