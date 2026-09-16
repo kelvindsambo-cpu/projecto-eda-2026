@@ -1,5 +1,7 @@
 package estruturas;
 
+import modelo.Paciente;
+
 public class No{
     private Paciente paciente;
     private No proximo;
