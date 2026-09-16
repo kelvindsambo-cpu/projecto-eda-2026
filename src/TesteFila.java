@@ -1,3 +1,7 @@
+import excecoes.PacienteInvalidoException;
+import estruturas.Fila;
+import modelo.Paciente;
+public class TesteFila {
 public static void main(String[] args) throws PacienteInvalidoException {
 
         Fila fila = new Fila();
