@@ -16,7 +16,7 @@ public class Fila {
     public int tamanho(){
         return tamanho;
     }
-    public void adcionar(Paciente paciente){
+    public void adicionar(Paciente paciente){
         No novoNo = new No(paciente);
         if(isEmpty()){
             inicio = novoNo;
