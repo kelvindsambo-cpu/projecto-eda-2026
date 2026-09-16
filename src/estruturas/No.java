@@ -10,11 +10,10 @@ public class No{
         this.proximo = null;
     }
     public Paciente getPaciente(){
-        return paciente;
+        return this.paciente;
     }
     public No getProximo(){
-        return proximo;
-
+        return this.proximo;
     }
     public void setProximo(No proximo){
         this.proximo = proximo;

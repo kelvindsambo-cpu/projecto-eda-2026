@@ -2,12 +2,10 @@ package estruturas;
 
 import excecoes.FilaVaziaException;
 import modelo.Paciente;
-
 public class Fila implements IFila<Paciente> {
     private No inicio;
     private No fim;
     private int tamanho;
-
     public Fila(){
         this.inicio = null;
         this.fim = null;
@@ -43,7 +41,6 @@ public class Fila implements IFila<Paciente> {
         }
         return paciente;
     }
-    
     public Paciente peek() throws FilaVaziaException {
         if(isEmpty()){
             throw new FilaVaziaException("A fila está vazia.");
