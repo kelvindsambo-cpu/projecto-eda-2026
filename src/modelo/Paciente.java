@@ -1,5 +1,8 @@
 package modelo;
 
+import excecoes.PacienteInvalidoException;
+import util.Validacao;
+
 public class Paciente {
     private int id;
     private String nome;
@@ -10,7 +13,9 @@ public class Paciente {
     private String sintomas;
     private boolean triado;
 
-    public Paciente(int id, String nome, int idade) {
+    public Paciente(int id, String nome, int idade) throws PacienteInvalidoException {
+        Validacao.validarPaciente(nome, idade);
+
         this.id = id;
         this.nome = nome;
         this.idade = idade;
