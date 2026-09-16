@@ -1,36 +1,40 @@
-package src.modelo;
+package modelo;
 
 public enum NivelTriagem {
-    EMERGENCIA(1, "Vermelho"),
-    MUITO_URGENTE(2, "Laranja"),
-    URGENTE (3, "Amarelo"),
-    NORMAL (4, "Verde"),
-    NAO_URGENTE(5, "Azul");
+    EMERGENCIA(1, "Emergência", "Vermelho"),
+    MUITO_URGENTE(2, "Muito Urgente", "Laranja"),
+    URGENTE(3, "Urgente", "Amarelo"),
+    NORMAL(4, "Normal", "Verde"),
+    NAO_URGENTE(5, "Não Urgente", "Azul");
 
-    private final String descricao;
     private final int nivel;
+    private final String categoria;
     private final String cor;
 
-    NivelTriagem( int nivel, String cor) {
-       this.descricao = "";
-       this.nivel= nivel;
-       this.cor= cor; 
+    NivelTriagem(int nivel, String categoria, String cor) {
+        this.nivel = nivel;
+        this.categoria = categoria;
+        this.cor = cor;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-    
     public int getNivel() {
         return nivel;
+    }
+
+    public String getCategoria() {
+        return categoria;
     }
 
     public String getCor() {
         return cor;
     }
 
-    @Override 
+    public boolean isPrioritario() {
+        return this.nivel <= 3;
+    }
+
+    @Override
     public String toString() {
-        return descricao + "(" + nivel + "," + cor + ")";
+        return nivel + " - " + categoria + " (" + cor + ")";
     }
 }

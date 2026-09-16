@@ -1,21 +1,29 @@
-package src.modelo;
+package modelo;
+
+import java.time.LocalDateTime;
+
+import excecoes.PacienteInvalidoException;
+import util.Validacao;
 
 public class Triagem {
     private Paciente paciente;
     private String sintomas;
     private NivelTriagem nivel;
-    
-    public Triagem ( Paciente paciente, String sintomas, NivelTriagem nivel){
-        this.paciente= paciente;
-        this.sintomas= sintomas;
-        this.nivel= nivel;
+    private LocalDateTime dataHoraTriagem;
+
+    public Triagem(Paciente paciente, String sintomas, NivelTriagem nivel) throws PacienteInvalidoException {
+        Validacao.validarTriagem(paciente, sintomas, nivel);
+
+        this.paciente = paciente;
+        this.sintomas = sintomas;
+        this.nivel = nivel;
+        this.dataHoraTriagem = LocalDateTime.now();
 
         this.paciente.setSintomas(sintomas);
-        this.paciente.setNivelTriagem (nivel);
-        this.paciente.setTriado(true);
-        
+        this.paciente.setNivel(nivel);
     }
 
+    // Getters
     public Paciente getPaciente() {
         return paciente;
     }
@@ -28,12 +36,14 @@ public class Triagem {
         return nivel;
     }
 
-    
-    
-    @Override 
-    public String toString() {
-        return "Triagem \n "+ paciente.getNome() +
-             "\n Prioridade: "+nivel.getDescricao() ;
+    public LocalDateTime getDataHoraTriagem() {
+        return dataHoraTriagem;
     }
 
+    @Override
+    public String toString() {
+        return "Triagem - Paciente: " + paciente.getNome() +
+                " | Nível: " + nivel.getCategoria() +
+                " (" + nivel.getCor() + ")";
+    }
 }

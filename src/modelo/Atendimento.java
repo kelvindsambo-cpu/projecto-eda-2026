@@ -1,7 +1,10 @@
-package src.modelo;
+package modelo;
+
+import excecoes.PacienteInvalidoException;
+import util.Validacao;
 
 public class Atendimento {
-    private static int geradorId=1;
+    private static int geradorId = 1;
 
     private int id;
     private Paciente paciente;
@@ -11,27 +14,39 @@ public class Atendimento {
     private EstadoAtendimento estado;
     private String observacoes;
 
-    
-    public Atendimento ( Paciente paciente, String medico){
-        this.id= geradorId++;
-        this.paciente= paciente;
-        this.medico= medico;
-        this.horaInicio= System.currentTimeMillis();
-        this.estado= EstadoAtendimento.EM_ATENDIMENTO;
-        this.horaFim= 0;
-        this.observacoes= " ";
+    public Atendimento(Paciente paciente, String medico) throws PacienteInvalidoException {
+        Validacao.validarAtendimento(paciente, medico);
+
+        this.id = geradorId++;
+        this.paciente = paciente;
+        this.medico = medico;
+        this.horaInicio = System.currentTimeMillis();
+        this.horaFim = 0;
+        this.estado = EstadoAtendimento.EM_ATENDIMENTO;
+        this.observacoes = "Em andamento";
+
+        this.paciente.setEstado(EstadoAtendimento.EM_ATENDIMENTO);
     }
 
-    public long getDuracaoSegundos(){
-        long fim;
-        if (estado== EstadoAtendimento.EM_ATENDIMENTO){
-            fim=System.currentTimeMillis();
-        } else {
-            fim= horaFim;
-        }
-        return (fim-horaInicio)/1000;
+    public void finalizar(String observacoes) {
+        this.horaFim = System.currentTimeMillis();
+        this.estado = EstadoAtendimento.ATENDIDO;
+        this.observacoes = (observacoes != null && !observacoes.trim().isEmpty())
+                ? observacoes
+                : "Sem observações";
+
+        // Sincroniza o estado final no objeto Paciente
+        this.paciente.setEstado(EstadoAtendimento.ATENDIDO);
     }
 
+    public long getDuracaoSegundos() {
+        long fim = (estado == EstadoAtendimento.EM_ATENDIMENTO)
+                ? System.currentTimeMillis()
+                : horaFim;
+        return (fim - horaInicio) / 1000;
+    }
+
+    // Getters
     public int getId() {
         return id;
     }
@@ -48,25 +63,21 @@ public class Atendimento {
         return horaInicio;
     }
 
-    public EstadoAtendimento estado() {
-        return estado;
+    public long getHoraFim() {
+        return horaFim;
     }
+
+    public EstadoAtendimento getEstado() {
+        return estado;
+    } // Corrigido de estado() para getEstado()
 
     public String getObservacoes() {
         return observacoes;
     }
 
-    public void finalizar ( String observacoes){
-        this.horaFim= System.currentTimeMillis();
-        this.estado=EstadoAtendimento.ATENDIDO;
-        this.observacoes= observacoes;
-    }
-
-    @Override 
+    @Override
     public String toString() {
-        return "Atendimento \n id: " + id+ "\n Paciente: " + paciente.getNome()+
-                "\n Médico " + medico + "\n emCurso: " + estado ;
-
+        return String.format("Atendimento #%d | Paciente: %s | Médico: %s | Estado: %s | Duração: %ds",
+                id, paciente.getNome(), medico, estado, getDuracaoSegundos());
     }
-    
 }
