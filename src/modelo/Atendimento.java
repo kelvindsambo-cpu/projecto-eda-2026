@@ -1,6 +1,7 @@
 package modelo;
 
 import excecoes.PacienteInvalidoException;
+import excecoes.TriagemPendenteException;
 import util.Validacao;
 
 public class Atendimento {
@@ -14,7 +15,7 @@ public class Atendimento {
     private EstadoAtendimento estado;
     private String observacoes;
 
-    public Atendimento(Paciente paciente, String medico) throws PacienteInvalidoException {
+    public Atendimento(Paciente paciente, String medico) throws TriagemPendenteException, PacienteInvalidoException {
         Validacao.validarAtendimento(paciente, medico);
 
         this.id = geradorId++;

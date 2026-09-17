@@ -1,6 +1,7 @@
 package modelo;
 
 import excecoes.PacienteInvalidoException;
+import excecoes.TriagemPendenteException;
 import util.Validacao;
 
 public class Paciente {
@@ -58,13 +59,13 @@ public class Paciente {
         return sintomas;
     }
 
-    /**
-     * Retorna o valor numérico da prioridade.
-     * Caso o paciente ainda não tenha sido triado, retorna 5 (menor prioridade por
-     * omissão).
-     */
-    public int getPrioridade() {
-        return (nivel != null) ? nivel.getNivel() : 5;
+    public int getPrioridade() throws TriagemPendenteException {
+        if (!triado || nivel == null) {
+            throw new TriagemPendenteException(
+                    "O paciente " + nome + " ainda não foi triado.");
+        }
+
+        return nivel.getNivel();
     }
 
     // Setters

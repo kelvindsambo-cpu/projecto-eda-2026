@@ -4,9 +4,6 @@ import excecoes.FilaVaziaException;
 
 public interface IFila<T> {
     
-    /**
-     * Adiciona um elemento ao final da fila (ou na posição correcta por prioridade).
-     */
     void enqueue(T elemento);
 
     /**
