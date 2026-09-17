@@ -1,6 +1,7 @@
 package estruturas;
 
 import excecoes.FilaVaziaException;
+import excecoes.TriagemPendenteException;
 import modelo.Paciente;
 
 /**
@@ -14,19 +15,36 @@ public class FilaPrioridade implements IFila<Paciente> {
     public void enqueue(Paciente paciente) {
         No novo = new No(paciente);
 
-        if (isEmpty() || paciente.getPrioridade() < inicio.getPaciente().getPrioridade()) {
+        final int prioridade;
+        try {
+            prioridade = paciente.getPrioridade();
+        } catch (TriagemPendenteException e) {
+            throw new IllegalArgumentException(
+                    "Só pacientes triados podem entrar na fila de prioridade.", e);
+        }
+
+        if (isEmpty() || prioridade < prioridadeDo(inicio.getPaciente())) {
             novo.setProximo(inicio);
             inicio = novo;
         } else {
             No atual = inicio;
             while (atual.getProximo() != null
-                    && atual.getProximo().getPaciente().getPrioridade() <= paciente.getPrioridade()) {
+                    && prioridadeDo(atual.getProximo().getPaciente()) <= prioridade) {
                 atual = atual.getProximo();
             }
             novo.setProximo(atual.getProximo());
             atual.setProximo(novo);
         }
         tamanho++;
+    }
+
+    private int prioridadeDo(Paciente paciente) {
+        try {
+            return paciente.getPrioridade();
+        } catch (TriagemPendenteException e) {
+            throw new IllegalStateException(
+                    "A fila de prioridade contém um paciente sem triagem.", e);
+        }
     }
 
     @Override
