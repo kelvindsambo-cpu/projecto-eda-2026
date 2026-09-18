@@ -26,6 +26,7 @@ public class Atendimento {
         this.estado = EstadoAtendimento.EM_ATENDIMENTO;
         this.observacoes = "Em andamento";
 
+        // O Atendimento é a fonte de verdade do estado; Paciente.estado é um espelho para consulta.
         this.paciente.setEstado(EstadoAtendimento.EM_ATENDIMENTO);
     }
 
@@ -36,7 +37,7 @@ public class Atendimento {
                 ? observacoes
                 : "Sem observações";
 
-        // Sincroniza o estado final no objeto Paciente
+        // Sincroniza o estado final no Paciente (espelho do estado do Atendimento)
         this.paciente.setEstado(EstadoAtendimento.ATENDIDO);
     }
 
@@ -70,7 +71,7 @@ public class Atendimento {
 
     public EstadoAtendimento getEstado() {
         return estado;
-    } // Corrigido de estado() para getEstado()
+    }
 
     public String getObservacoes() {
         return observacoes;

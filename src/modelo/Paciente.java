@@ -9,6 +9,7 @@ public class Paciente {
     private String nome;
     private int idade;
     private NivelTriagem nivel;
+    // Só para consulta/estatística; a ordem nas filas é a ordem de inserção.
     private long horaChegada;
     private EstadoAtendimento estado;
     private String sintomas;
@@ -76,10 +77,6 @@ public class Paciente {
 
     public void setSintomas(String sintomas) {
         this.sintomas = sintomas;
-    }
-
-    public void setTriado(boolean triado) {
-        this.triado = triado;
     }
 
     public void setEstado(EstadoAtendimento estado) {

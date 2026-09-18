@@ -1,21 +1,27 @@
 package estruturas;
 
-import modelo.Paciente;
+/**
+ * Nó de uma lista simplesmente ligada: guarda um elemento e a referência
+ * para o nó seguinte.
+ */
+public class No<T> {
+    private T elemento;
+    private No<T> proximo;
 
-public class No{
-    private Paciente paciente;
-    private No proximo;
-    public No(Paciente paciente){
-        this.paciente = paciente;
+    public No(T elemento) {
+        this.elemento = elemento;
         this.proximo = null;
     }
-    public Paciente getPaciente(){
-        return this.paciente;
+
+    public T getElemento() {
+        return this.elemento;
     }
-    public No getProximo(){
+
+    public No<T> getProximo() {
         return this.proximo;
     }
-    public void setProximo(No proximo){
+
+    public void setProximo(No<T> proximo) {
         this.proximo = proximo;
     }
 }

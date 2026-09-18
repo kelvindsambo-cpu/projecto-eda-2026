@@ -1,5 +1,7 @@
 package estruturas;
 
+import java.util.List;
+
 import excecoes.FilaVaziaException;
 
 public interface IFila<T> {
@@ -27,4 +29,10 @@ public interface IFila<T> {
      * Retorna o número de elementos na fila.
      */
     int size();
+
+    /**
+     * Retorna uma cópia dos elementos, do primeiro ao último, sem alterar a fila.
+     * Serve para consulta/visualização (ex.: GUI).
+     */
+    List<T> toList();
 }
