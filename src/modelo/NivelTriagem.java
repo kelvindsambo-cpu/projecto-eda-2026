@@ -35,6 +35,6 @@ public enum NivelTriagem {
 
     @Override
     public String toString() {
-        return nivel + " - " + categoria + " (" + cor + ")";
+        return nivel + " - " + categoria;
     }
 }
