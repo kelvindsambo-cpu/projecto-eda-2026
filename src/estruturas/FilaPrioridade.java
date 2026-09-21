@@ -19,7 +19,7 @@ public class FilaPrioridade implements IFila<Paciente> {
 
     @Override
     public void enqueue(Paciente paciente) {
-        No<Paciente> novo = new No<>(paciente);
+        No<Paciente> novoNo = new No<>(paciente);
 
         final int prioridade;
         try {
@@ -30,16 +30,16 @@ public class FilaPrioridade implements IFila<Paciente> {
         }
 
         if (isEmpty() || prioridade < prioridadeDo(inicio.getElemento())) {
-            novo.setProximo(inicio);
-            inicio = novo;
+            novoNo.setProximo(inicio);
+            inicio = novoNo;
         } else {
             No<Paciente> atual = inicio;
             while (atual.getProximo() != null
                     && prioridadeDo(atual.getProximo().getElemento()) <= prioridade) {
                 atual = atual.getProximo();
             }
-            novo.setProximo(atual.getProximo());
-            atual.setProximo(novo);
+            novoNo.setProximo(atual.getProximo());
+            atual.setProximo(novoNo);
         }
         tamanho++;
     }
