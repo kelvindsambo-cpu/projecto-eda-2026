@@ -1,6 +1,11 @@
 # projecto-eda-2026
 Projecto semestral da cadeira de Estrutura de Dados e Algoritmo — simulação do atendimento hospitalar com Fila (FIFO) e Fila de Prioridade.
 
+## Documentação
+
+- [Diagrama de classes](docs/diagrama-classes.png)
+- [Fluxograma do atendimento](docs/fluxograma.png)
+
 ## Compilar e testar
 
 A GUI usa o FlatLaf, que está em `lib/`.
