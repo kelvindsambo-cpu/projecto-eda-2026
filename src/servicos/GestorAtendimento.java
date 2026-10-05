@@ -21,7 +21,7 @@ import util.Validacao;
  * É o único ponto de entrada da GUI: registar → triar → chamar próximo → finalizar.
  */
 public class GestorAtendimento {
-    private final Fila filaNormal;
+    private final Fila<Paciente> filaNormal;
     private final FilaPrioridade filaPrioridade;
     private final Map<Integer, Paciente> pacientes;
     private final List<Atendimento> historico;
@@ -29,7 +29,7 @@ public class GestorAtendimento {
     private int proximoId;
 
     public GestorAtendimento() {
-        this.filaNormal = new Fila();
+        this.filaNormal = new Fila<>();
         this.filaPrioridade = new FilaPrioridade();
         this.pacientes = new LinkedHashMap<>();
         this.historico = new ArrayList<>();
