@@ -23,6 +23,8 @@ public class DlgNovoPaciente extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.gestorAtendimento = gestorAtendimento;
+        // Enter nos campos de texto regista o paciente.
+        getRootPane().setDefaultButton(btRegistar);
     }
 
     /**
@@ -161,9 +163,13 @@ public class DlgNovoPaciente extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
+        // Enter no nome passa para a idade.
+        txtIdade.requestFocusInWindow();
     }//GEN-LAST:event_txtNomeActionPerformed
 
     private void txtIdadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdadeActionPerformed
+        // Enter na idade regista o paciente.
+        btRegistar.doClick();
     }//GEN-LAST:event_txtIdadeActionPerformed
 
     private void btRegistarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegistarActionPerformed
