@@ -12,18 +12,23 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -74,12 +79,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             columnModel1.getColumn(1).setPreferredWidth(330);
         columnModel1.getColumn(2).setPreferredWidth(100);
         
-        DefaultTableCellRenderer centro1 = new DefaultTableCellRenderer();
-        centro.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        columnModel.getColumn(0).setCellRenderer(centro);
-        columnModel.getColumn(2).setCellRenderer(centro);
-        
+        columnModel1.getColumn(0).setCellRenderer(centro);
+        columnModel1.getColumn(2).setCellRenderer(centro);
+
         JTableHeader cabecalho1 = tbPacienteTriagem.getTableHeader();
         cabecalho1.setFont(new Font("SansSerif", Font.BOLD,14));
         cabecalho1.setForeground(Color.decode("#1E293B"));
@@ -165,41 +167,103 @@ comboNivelTriagem.setRenderer(new DefaultListCellRenderer() {
         return this;
     }
 });
-    configurarTabelasFilas();
-selecionarBotao(btDashboard);
-        
+        configurarTabelasFilas();
+        configurarMenuLateral();
+        selecionarBotao(btDashboard);
+
+        txtMedicoResponsavel.putClientProperty("JTextField.placeholderText", "Nome do médico responsável");
+        txtMedicoResponsavel.setToolTipText("Médico responsável pelo atendimento");
+
         this.gestorAtendimento = new GestorAtendimento();
-            atualizarDashBoard();
-           ImageIcon icson = new ImageIcon(
-                   getClass().getResource("/gui/images/hospital.png")
-           );
-           ImageIcon icon = new ImageIcon(
-    getClass().getResource("/gui/images/hospital.png")
-);
+        atualizarDashBoard();
 
-setIconImage(icon.getImage());
-           
-
+        ImageIcon icon = new ImageIcon(getClass().getResource("/gui/images/hospital.png"));
+        setIconImage(icon.getImage());
     }
     
     
-           private void selecionarBotao(JButton bt){
-               btDashboard.setBackground(Color.white);
-               btPacientes.setBackground(Color.white);
-               btTriagem.setBackground(Color.white);
-               btFilas.setBackground(Color.white);
-               btAtendimento.setBackground(Color.white);
-               btHistorico.setBackground(Color.white);
-               
-               bt.setBackground(new Color(0xDBEAFE));
-           }
+    /** Cores do menu lateral (com transparência, por cima do fundo branco da sidebar). */
+    private static final Color MENU_HOVER = new Color(15, 23, 42, 20);
+    private static final Color MENU_ACTIVO = new Color(37, 99, 235, 40);
+    private static final Color MENU_BARRA_ACTIVO = new Color(37, 99, 235);
+    private static final Color MENU_TEXTO = new Color(51, 65, 85);
+    private static final Color MENU_TEXTO_ACTIVO = new Color(29, 78, 216);
+    private static final String MENU_ACTIVO_PROP = "menu.activo";
+
+    private JButton[] botoesMenu() {
+        return new JButton[] {btDashboard, btPacientes, btTriagem, btFilas, btAtendimento, btHistorico};
+    }
+
+    /** Dá aos botões da sidebar realce ao passar o rato, dica e indicador da secção actual. */
+    private void configurarMenuLateral() {
+        String[] dicas = {
+            "Dashboard — visão geral do atendimento",
+            "Pacientes — registar e listar pacientes",
+            "Triagem — avaliar e classificar pacientes",
+            "Filas — fila prioritária e fila normal",
+            "Atendimento — chamar e finalizar atendimentos",
+            "Histórico — atendimentos realizados"
+        };
+        JButton[] botoes = botoesMenu();
+        for (int i = 0; i < botoes.length; i++) {
+            JButton bt = botoes[i];
+            bt.setUI(new BotaoMenuUI());
+            bt.setOpaque(false);
+            bt.setContentAreaFilled(false);
+            bt.setBorderPainted(true);
+            bt.setRolloverEnabled(true);
+            bt.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 12));
+            bt.setIconTextGap(12);
+            bt.setForeground(MENU_TEXTO);
+            bt.setToolTipText(dicas[i]);
+        }
+    }
+
+    private void selecionarBotao(JButton bt) {
+        for (JButton b : botoesMenu()) {
+            boolean activo = b == bt;
+            b.putClientProperty(MENU_ACTIVO_PROP, activo);
+            b.setForeground(activo ? MENU_TEXTO_ACTIVO : MENU_TEXTO);
+            b.repaint();
+        }
+    }
+
+    /**
+     * Pinta o fundo do botão do menu: translúcido ao passar o rato (ou com foco do teclado)
+     * e azul translúcido com barra lateral quando é a secção actual.
+     */
+    private static class BotaoMenuUI extends BasicButtonUI {
+        @Override
+        public void update(Graphics g, JComponent c) {
+            AbstractButton b = (AbstractButton) c;
+            boolean activo = Boolean.TRUE.equals(b.getClientProperty(MENU_ACTIVO_PROP));
+            boolean hover = b.getModel().isRollover() || b.isFocusOwner();
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            if (activo) {
+                g2.setColor(MENU_ACTIVO);
+                g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 10, 10);
+                if (hover) {
+                    g2.setColor(MENU_HOVER);
+                    g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 10, 10);
+                }
+                g2.setColor(MENU_BARRA_ACTIVO);
+                g2.fillRoundRect(0, 6, 4, c.getHeight() - 12, 4, 4);
+            } else if (hover) {
+                g2.setColor(MENU_HOVER);
+                g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 10, 10);
+            }
+            g2.dispose();
+            paint(g, c);
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -502,7 +566,6 @@ setIconImage(icon.getImage());
             .addGroup(pnSidebarLayout.createSequentialGroup()
                 .addGroup(pnSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-                    .addComponent(btAtendimento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnSidebarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(pnSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -510,8 +573,9 @@ setIconImage(icon.getImage());
                             .addComponent(btPacientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btTriagem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btFilas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(btHistorico, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btFilas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btAtendimento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         pnSidebarLayout.setVerticalGroup(
@@ -1353,7 +1417,7 @@ setIconImage(icon.getImage());
 
         lbNomePacienteProximo.setBackground(new java.awt.Color(255, 255, 255));
         lbNomePacienteProximo.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
-        lbNomePacienteProximo.setText("Nao ha Pacientes aguardando atendimento");
+        lbNomePacienteProximo.setText("Não há pacientes aguardando atendimento!");
         lbNomePacienteProximo.setAlignmentX(0.5F);
         lbNomePacienteProximo.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 50, 10, 50));
         lbNomePacienteProximo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1386,9 +1450,10 @@ setIconImage(icon.getImage());
         lbNivelAtendimento3.setBackground(new java.awt.Color(255, 255, 255));
         lbNivelAtendimento3.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
         lbNivelAtendimento3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lbNivelAtendimento3.setText("Medico");
+        lbNivelAtendimento3.setText("Médico:");
+        lbNivelAtendimento3.setToolTipText("Médico responsável pelo atendimento");
         lbNivelAtendimento3.setAlignmentX(0.5F);
-        lbNivelAtendimento3.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 50, 10, 50));
+        lbNivelAtendimento3.setBorder(javax.swing.BorderFactory.createEmptyBorder(2, 10, 2, 5));
         lbNivelAtendimento3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         txtMedicoResponsavel.addActionListener(new java.awt.event.ActionListener() {
@@ -1766,7 +1831,6 @@ setIconImage(icon.getImage());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btPacientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btPacientesActionPerformed
-        // TODO add your handling code here:
         atualizarTabelaPacientes();
         selecionarBotao(btPacientes);
         CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
@@ -1775,18 +1839,13 @@ setIconImage(icon.getImage());
     }//GEN-LAST:event_btPacientesActionPerformed
 
     private void btDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDashboardActionPerformed
-        // TODO add your handling code here:
         selecionarBotao(btDashboard);
-atualizarDashBoard()
-;        
-
-        
+        atualizarDashBoard();
     }//GEN-LAST:event_btDashboardActionPerformed
 
     private void atualizarDashBoard(){
-            CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
+        CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
         cardLayout.show(pnConteudo, "pnDashboard");
-        int totalPacientes = gestorAtendimento.listarPacientes().size();
         int emEspera = gestorAtendimento.listarFilaNormal().size() + gestorAtendimento.listarFilaPrioridade().size();
         lbNumeroAguardando.setText(String.valueOf(emEspera));
         lbNumeroPrioridade.setText(String.valueOf(gestorAtendimento.listarFilaPrioridade().size()));
@@ -1794,7 +1853,6 @@ atualizarDashBoard()
     }
     
     private void btAtendimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtendimentoActionPerformed
-        // TODO add your handling code here:
         selecionarBotao(btAtendimento);
         atualizarPainelProximoPacienteAtendimento();
                 CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
@@ -1806,25 +1864,18 @@ atualizarDashBoard()
         
     }//GEN-LAST:event_btAtendimentoActionPerformed
 
+    /** Mostra o próximo paciente; proximoPaciente() lança FilaVaziaException se não houver nenhum. */
     private void atualizarPainelProximoPacienteAtendimento(){
         try {
-           
-            if (gestorAtendimento.proximoPaciente() != null) {
-                btChamarProximo.setEnabled(true);
-                lbNivelAtendimento3.setVisible(true);
-                txtMedicoResponsavel.setVisible(true);
-                Paciente proximoPaciente = gestorAtendimento.proximoPaciente();
+            Paciente proximoPaciente = gestorAtendimento.proximoPaciente();
+            btChamarProximo.setEnabled(true);
+            lbNivelAtendimento3.setVisible(true);
+            txtMedicoResponsavel.setVisible(true);
             lbNomePacienteProximo.setText("Nome : " + proximoPaciente.getNome());
             lbIDPacienteProximo.setText("ID : " + proximoPaciente.getId());
             lbNivelPacienteProximo.setText("Nivel : " + proximoPaciente.getNivel());
-            }else{
-                lbNivelAtendimento3.setVisible(false);
-                txtMedicoResponsavel.setVisible(false);
-             
-            }
-            
         } catch (FilaVaziaException ex) {
-            lbNomePacienteProximo.setText("Nao ha Pacientes aguardando atendimento." );
+            lbNomePacienteProximo.setText("Não há pacientes aguardando atendimento." );
             lbIDPacienteProximo.setText("");
             lbNivelPacienteProximo.setText("");
             btChamarProximo.setEnabled(false);
@@ -1834,7 +1885,6 @@ atualizarDashBoard()
     }
     
     private void btTriagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTriagemActionPerformed
-        // TODO add your handling code here:
         selecionarBotao(btTriagem);
         atualizarTabelaPacientesTriagem();
          CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
@@ -1842,7 +1892,6 @@ atualizarDashBoard()
     }//GEN-LAST:event_btTriagemActionPerformed
 
     private void btFilasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFilasActionPerformed
-        // TODO add your handling code here:
         selecionarBotao(btFilas);
         atualizarTabelaNormal();
         atualizarTabelaPrioritaria();
@@ -1851,7 +1900,6 @@ atualizarDashBoard()
     }//GEN-LAST:event_btFilasActionPerformed
 
     private void btHistoricoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btHistoricoActionPerformed
-        // TODO add your handling code here:
         selecionarBotao(btHistorico);
         prencherTabelaHistorico();
                  CardLayout cardLayout = (CardLayout) pnConteudo.getLayout();
@@ -1889,7 +1937,6 @@ atualizarDashBoard()
     }
     
     private void btRealizarTriagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRealizarTriagemActionPerformed
-        // TODO add your handling code here:
         int linha = tbPacienteTriagem.getSelectedRow();
         if(linha == -1){
             JOptionPane.showMessageDialog(this, "Selecione um paciente.", "Triagem", JOptionPane.WARNING_MESSAGE);
@@ -1920,7 +1967,6 @@ atualizarDashBoard()
     }//GEN-LAST:event_btRealizarTriagemActionPerformed
 
     private void tbPacienteTriagemMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbPacienteTriagemMouseClicked
-        // TODO add your handling code here:
         int linha = tbPacienteTriagem.getSelectedRow();
         if (linha != -1) {
             int id = (int) tbPacienteTriagem.getValueAt(linha, 0);
@@ -1933,23 +1979,24 @@ atualizarDashBoard()
     }//GEN-LAST:event_tbPacienteTriagemMouseClicked
 
     private void txtPesquisarPacienteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPesquisarPacienteKeyReleased
-        // TODO add your handling code here:
         pesquisarPacientesTriagem();
     }//GEN-LAST:event_txtPesquisarPacienteKeyReleased
 
     private void txtPesquisarPacienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPesquisarPacienteActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_txtPesquisarPacienteActionPerformed
 
     private void btNovoPacienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNovoPacienteActionPerformed
-        // TODO add your handling code here:
         DlgNovoPaciente dlgNovoPaciente = new DlgNovoPaciente(this, true, gestorAtendimento);
         dlgNovoPaciente.setLocationRelativeTo(this);
+        dlgNovoPaciente.setVisible(true); // modal: bloqueia até o diálogo fechar
         atualizarTabelaPacientes();
     }//GEN-LAST:event_btNovoPacienteActionPerformed
 
     private void txtMedicoResponsavelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMedicoResponsavelActionPerformed
-        // TODO add your handling code here:
+        // Enter no campo do médico inicia o atendimento.
+        if (btChamarProximo.isEnabled()) {
+            btChamarProximo.doClick();
+        }
     }//GEN-LAST:event_txtMedicoResponsavelActionPerformed
 
     private void btChamarProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btChamarProximoActionPerformed
@@ -1958,67 +2005,38 @@ atualizarDashBoard()
             return;
         }
         try {
-            // TODO add your handling code here:
             gestorAtendimento.chamarProximo(txtMedicoResponsavel.getText().trim());
-            try {
-           
-            if (gestorAtendimento.proximoPaciente() != null) {
-                btChamarProximo.setEnabled(true);
-                lbNivelAtendimento3.setVisible(true);
-                txtMedicoResponsavel.setVisible(true);
-                Paciente proximoPaciente = gestorAtendimento.proximoPaciente();
-            lbNomePacienteProximo.setText("Nome : " + proximoPaciente.getNome());
-            lbIDPacienteProximo.setText("ID : " + proximoPaciente.getId());
-            lbNivelPacienteProximo.setText("Nivel : " + proximoPaciente.getNivel());
-            }else{
-                lbNivelAtendimento3.setVisible(false);
-                txtMedicoResponsavel.setVisible(false);
-             
-            }
-            
-        } catch (FilaVaziaException ex) {
-            lbNomePacienteProximo.setText("Nao ha Pacientes aguardando atendimento." );
-            lbIDPacienteProximo.setText("");
-            lbNivelPacienteProximo.setText("");
-            btChamarProximo.setEnabled(false);
-             lbNivelAtendimento3.setVisible(false);
-                txtMedicoResponsavel.setVisible(false);
-        }
-            atualizarAtendimentoEmCurso();
-            if(gestorAtendimento.proximoPaciente() == null){
-            btChamarProximo.setEnabled(false);
-            lbNomePacienteProximo.setText("Nao ha Pacientes aguardando atendimento");
-            }
         } catch (FilaVaziaException | TriagemPendenteException | PacienteInvalidoException ex) {
-            lbNomePacienteProximo.setText("Nao ha Pacientes aguardando atendimento");
+            // Ex.: médico em falta ou fila vazia — mostra o motivo real e não altera nada.
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Atendimento", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+        // Só chega aqui se o atendimento foi criado.
         btFinalizarAtendimento.setEnabled(true);
         txtMedicoResponsavel.setText("");
+        atualizarAtendimentoEmCurso();
+        atualizarPainelProximoPacienteAtendimento();
     }//GEN-LAST:event_btChamarProximoActionPerformed
 
     private void btFinalizarAtendimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFinalizarAtendimentoActionPerformed
-        // TODO add your handling code here:
         String obser = areaTxtObservacoes.getText().trim();
-        gestorAtendimento.finalizarAtendimento(obser);
-        areaTxtObservacoes.setText("");
         try {
-            if (gestorAtendimento.proximoPaciente() == null) {
-                btChamarProximo.setEnabled(false);
-            }
-        } catch (FilaVaziaException ex) {
-            btChamarProximo.setEnabled(false);
+            gestorAtendimento.finalizarAtendimento(obser);
+        } catch (IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Atendimento", JOptionPane.WARNING_MESSAGE);
+            btFinalizarAtendimento.setEnabled(false);
+            return;
         }
-  
+        areaTxtObservacoes.setText("");
         btFinalizarAtendimento.setEnabled(false);
         atualizarAtendimentoEmCurso();
+        atualizarPainelProximoPacienteAtendimento();
     }//GEN-LAST:event_btFinalizarAtendimentoActionPerformed
 
     private void txtPesquisarHisoricoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPesquisarHisoricoActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_txtPesquisarHisoricoActionPerformed
 
     private void txtPesquisarHisoricoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPesquisarHisoricoKeyReleased
-        // TODO add your handling code here:
         pesquisarHisorico();
     }//GEN-LAST:event_txtPesquisarHisoricoKeyReleased
     

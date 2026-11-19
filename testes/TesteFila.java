@@ -4,7 +4,7 @@ import modelo.Paciente;
 
 public class TesteFila {
     public static void main(String[] args) throws Exception {
-        Fila fila = new Fila();
+        Fila<Paciente> fila = new Fila<>();
         verificar(fila.isEmpty() && fila.size() == 0, "fila inicialmente vazia");
 
         Paciente p1 = new Paciente(1, "Joao", 18);

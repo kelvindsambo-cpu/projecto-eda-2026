@@ -13,7 +13,6 @@ public class Paciente {
     private long horaChegada;
     private EstadoAtendimento estado;
     private String sintomas;
-    private boolean triado;
 
     public Paciente(int id, String nome, int idade) throws PacienteInvalidoException {
         Validacao.validarPaciente(nome, idade);
@@ -22,7 +21,6 @@ public class Paciente {
         this.nome = nome;
         this.idade = idade;
         this.horaChegada = System.currentTimeMillis();
-        this.triado = false;
         this.estado = EstadoAtendimento.AGUARDANDO;
         this.sintomas = "Sintomas não registados";
     }
@@ -44,8 +42,9 @@ public class Paciente {
         return horaChegada;
     }
 
+    /** Um paciente está triado quando já tem um nível atribuído. */
     public boolean isTriado() {
-        return triado;
+        return nivel != null;
     }
 
     public NivelTriagem getNivel() {
@@ -61,7 +60,7 @@ public class Paciente {
     }
 
     public int getPrioridade() throws TriagemPendenteException {
-        if (!triado || nivel == null) {
+        if (!isTriado()) {
             throw new TriagemPendenteException(
                     "O paciente " + nome + " ainda não foi triado.");
         }
@@ -72,7 +71,6 @@ public class Paciente {
     // Setters
     public void setNivel(NivelTriagem nivel) {
         this.nivel = nivel;
-        this.triado = true;
     }
 
     public void setSintomas(String sintomas) {

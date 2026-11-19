@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import excecoes.FilaVaziaException;
-import modelo.Paciente;
 
 /**
  * Fila FIFO implementada com lista ligada (referências para início e fim).
  * enqueue, dequeue, peek, isEmpty e size são O(1); toList é O(n).
  */
-public class Fila implements IFila<Paciente> {
-    private No<Paciente> inicio;
-    private No<Paciente> fim;
+public class Fila<T> implements IFila<T> {
+    private No<T> inicio;
+    private No<T> fim;
     private int tamanho;
 
     public Fila() {
@@ -32,8 +31,8 @@ public class Fila implements IFila<Paciente> {
     }
 
     @Override
-    public void enqueue(Paciente elemento) {
-        No<Paciente> novoNo = new No<>(elemento);
+    public void enqueue(T elemento) {
+        No<T> novoNo = new No<>(elemento);
         if (isEmpty()) {
             this.inicio = novoNo;
             this.fim = novoNo;
@@ -46,21 +45,21 @@ public class Fila implements IFila<Paciente> {
     }
 
     @Override
-    public Paciente dequeue() throws FilaVaziaException {
+    public T dequeue() throws FilaVaziaException {
         if (isEmpty()) {
             throw new FilaVaziaException("A fila está vazia.");
         }
-        Paciente paciente = this.inicio.getElemento();
+        T elemento = this.inicio.getElemento();
         this.inicio = this.inicio.getProximo();
         this.tamanho--;
         if (this.inicio == null) {
             this.fim = null;
         }
-        return paciente;
+        return elemento;
     }
 
     @Override
-    public Paciente peek() throws FilaVaziaException {
+    public T peek() throws FilaVaziaException {
         if (isEmpty()) {
             throw new FilaVaziaException("A fila está vazia.");
         }
@@ -68,9 +67,9 @@ public class Fila implements IFila<Paciente> {
     }
 
     @Override
-    public List<Paciente> toList() {
-        List<Paciente> lista = new ArrayList<>();
-        No<Paciente> atual = this.inicio;
+    public List<T> toList() {
+        List<T> lista = new ArrayList<>();
+        No<T> atual = this.inicio;
         while (atual != null) {
             lista.add(atual.getElemento());
             atual = atual.getProximo();
